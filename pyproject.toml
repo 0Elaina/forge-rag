@@ -1,0 +1,163 @@
+# =============================================================================
+# ForgeRAG — 企业知识库智能 RAG 后端系统
+# =============================================================================
+# 本文件是项目的构建与工具配置入口，采用 TOML 格式。
+# 它定义了项目元信息、Python 依赖、以及各种开发工具（pytest、ruff、mypy）
+# 的行为规则。
+# =============================================================================
+
+
+# ---------------------------------------------------------------------------
+# [build-system]  构建系统配置
+# ---------------------------------------------------------------------------
+# 声明使用 setuptools 作为打包构建后端，wheel 负责生成 .whl 分发格式。
+# 当执行 `pip install .` 或 `python -m build` 时，pip/build 会读取此处
+# 并安装对应版本的构建工具。
+#
+# 版本已固定（==），确保 CI/CD 环境与本地开发环境行为一致，避免因
+# setuptools 升级引入意料之外的构建行为变化。
+[build-system]
+requires = ["setuptools==80.9.0", "wheel==0.45.1"]
+build-backend = "setuptools.build_meta"
+
+
+# ---------------------------------------------------------------------------
+# [project]  项目核心元信息与运行时依赖
+# ---------------------------------------------------------------------------
+[project]
+name = "forgerag"                                       # 项目名称，也作为 PyPI 包名
+version = "0.1.0"                                       # 当前版本号（遵循语义化版本）
+description = "Enterprise Knowledge Base Agentic RAG Backend System"  # 简短描述
+readme = "README.md"                                    # 项目说明文档（PyPI 等会渲染此文件）
+requires-python = ">=3.11,<3.13"                        # 支持的 Python 版本范围
+
+# ---- 核心运行时依赖 ----
+# 注意：依赖被拆分成若干 optional-dependencies 组（见下方 [project.optional-dependencies]），
+# 安装时需按需选择附加组。此处只放零依赖或几乎零依赖的核心包。
+dependencies = [
+    # ---- Web 框架 ----
+    "fastapi==0.136.3",          # 异步 Web 框架，用于提供 REST API
+    "uvicorn==0.49.0",           # ASGI 服务器，启动 FastAPI 应用的运行时
+
+    # ---- 数据校验与配置 ----
+    "pydantic==2.13.4",          # 基于类型注解的数据校验库，FastAPI 的底层支柱
+    "pydantic-settings==2.14.1", # 从环境变量 / .env 文件加载配置的 Pydantic 扩展
+]
+
+# ---------------------------------------------------------------------------
+# [project.optional-dependencies]  可选依赖组
+# ---------------------------------------------------------------------------
+# 安装时通过方括号语法选择附加组，例如：
+#   pip install forgerag[dev]         # 安装项目 + 开发工具链
+#   pip install forgerag[db,rag]      # 安装项目 + 数据库 + RAG 相关依赖
+#
+# 将依赖拆分为多个组，有两大好处：
+#   1. 生产环境只需安装实际用到的组件，减小部署体积与攻击面；
+#   2. 语义清晰：新加入的开发者一眼就能看出项目包含哪些模块。
+[project.optional-dependencies]
+# -- dev: 开发工具链（测试、代码检查、类型检查） --
+# 仅在本地开发或 CI 的 lint/test 流程中安装，不进入生产环境。
+dev = [
+    # ---- 测试 ----
+    "pytest==9.0.3",             # 测试框架
+    "httpx2==2.3.0",             # HTTP 客户端（httpx 的 Pydantic 维护版 fork），
+                                 # 用于 FastAPI TestClient 发送异步请求
+
+    # ---- 代码检查与类型检查 ----
+    "ruff==0.15.16",             # 极速 Python linter + formatter（Rust 实现）
+    "mypy==2.1.0",               # 静态类型检查器，在运行前发现类型不匹配
+]
+
+# -- db: 关系型数据库 + 迁移 --
+# 连接 PostgreSQL 所需的 ORM、驱动与迁移管理。
+db = [
+    "sqlalchemy==2.0.50",        # 异步 ORM，用于操作关系型数据库
+    "asyncpg==0.31.0",           # PostgreSQL 异步驱动（SQLAlchemy 的 async 模式需要它）
+    "alembic==1.18.4",           # 数据库迁移管理（配合 SQLAlchemy 使用，管理 schema 变更）
+]
+
+# -- rag: RAG + LLM 编排 + 可观测性 --
+# 检索增强生成（Retrieval-Augmented Generation）的核心技术栈，
+# 包括向量数据库、LLM 编排框架、文档处理与链路追踪。
+rag = [
+    # ---- 向量数据库 ----
+    "qdrant-client==1.18.0",     # Qdrant 向量数据库的 Python 客户端
+
+    # ---- LangChain 生态（LLM 编排） ----
+    "langchain==1.3.6",          # LangChain 核心库：链式调用 LLM 的编排框架
+    "langchain-core==1.4.3",     # LangChain 核心抽象层（LCEL、Runnable 接口等）
+    "langgraph==1.2.4",          # LangGraph：基于图（状态机）的 Agent 工作流框架
+    "langchain-openai==1.3.0",   # LangChain 的 OpenAI/ChatGPT 模型集成
+    "langchain-qdrant==1.1.0",   # LangChain 的 Qdrant 向量存储集成
+    "langchain-text-splitters==1.1.2",  # LangChain 文本分割器（文档分块策略）
+
+    # ---- 可观测性 / LLM 链路追踪 ----
+    "langfuse==4.7.1",           # Langfuse：LLM 应用的可观测性与 Trace 追踪平台
+]
+
+
+# ---------------------------------------------------------------------------
+# [tool.setuptools.packages.find]  包发现规则
+# ---------------------------------------------------------------------------
+# 告诉 setuptools 自动发现哪些 Python 包需要被打包。
+# "app*" 表示所有以 "app" 开头的包目录（如 app、app.api、app.core 等）。
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+
+# ---------------------------------------------------------------------------
+# [tool.pytest.ini_options]  pytest 测试框架配置
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+testpaths = ["tests"]            # 测试用例所在目录
+
+# 注册自定义标记（方便按类别运行测试，如 pytest -m unit 只跑单元测试）
+markers = [
+    "unit: fast unit tests",                            # 快速单元测试
+    "integration: database or api integration tests",   # 数据库或 API 集成测试
+    "chain: rag or agentic rag flow tests",             # RAG 或 Agentic RAG 流程测试
+    "slow: slow tests",                                 # 慢速测试
+    "external: tests requiring real external services", # 依赖真实外部服务的测试
+]
+
+
+# ---------------------------------------------------------------------------
+# [tool.ruff]  Ruff 代码检查 / 格式化规则
+# ---------------------------------------------------------------------------
+# Ruff 是一个用 Rust 写的极速 Python linter + formatter，替代 flake8 / isort / pyupgrade。
+# 本项目中 Ruff 同时承担 linter 和 formatter 双重角色。
+[tool.ruff]
+line-length = 100                # 单行最大字符数
+target-version = "py311"         # 目标 Python 版本（Ruff 据此决定哪些语法可以推荐）
+
+# -- Lint 规则 --
+# select: 启用的检查规则类别（各字母含义见下）
+# ignore: 白名单——此处列出的规则不会被检查（当前为空，即所有选中的规则都生效）
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle 错误 — 代码风格违反 PEP 8
+    "F",   # pyflakes      — 未使用导入、未定义变量等逻辑问题
+    "I",   # isort         — 导入语句排序
+    "B",   # flake8-bugbear — 容易出 bug 的写法
+    "UP",  # pyupgrade     — 建议使用更高 Python 版本引入的新语法
+]
+ignore = []
+
+# -- Formatter 规则 --
+# 替代 Black 的格式化配置，Ruff 内置的 formatter 与 Black 兼容但更快。
+[tool.ruff.format]
+quote-style = "double"           # 始终使用双引号（与 PEP 8 推荐一致）
+indent-style = "space"           # 缩进使用空格（Python 标准）
+line-ending = "auto"             # 换行符由操作系统决定（Windows: CRLF, Unix: LF）
+
+
+# ---------------------------------------------------------------------------
+# [tool.mypy]  Mypy 静态类型检查器配置
+# ---------------------------------------------------------------------------
+# Mypy 对带有类型注解的 Python 代码做静态分析，在运行前发现类型不匹配。
+[tool.mypy]
+python_version = "3.11"          # 按 Python 3.11 的语法和标准库进行类型检查
+warn_return_any = true           # 如果函数返回值被推断为 Any（未标注返回类型），发出警告
+warn_unused_configs = true       # 发现 mypy 配置项没生效时，发出警告
+disallow_untyped_defs = true     # 要求所有函数定义都必须有类型注解（严格模式）
+ignore_missing_imports = true    # 对无法获取类型存根的第三方包保持安静（不报错）
