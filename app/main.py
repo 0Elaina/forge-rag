@@ -6,6 +6,9 @@ from app.api.v1.router import api_router
 
 # 导入应用配置获取函数，用于读取环境变量和配置信息
 from app.common.config import get_settings
+from app.common.exception_handler import register_exception_handlers
+from app.common.logging import configure_logging
+from app.common.middleware import RequestIdMiddleware
 
 
 def create_app() -> FastAPI:
@@ -17,6 +20,8 @@ def create_app() -> FastAPI:
     """
     # 获取应用配置（包括应用名称、数据库连接等）
     settings = get_settings()
+    # 配置日志记录器
+    configure_logging(settings.log_level)
 
     # 创建 FastAPI 应用实例，配置基本信息
     app = FastAPI(
@@ -27,6 +32,14 @@ def create_app() -> FastAPI:
         redoc_url="/redoc",  # ReDoc 文档路径
         openapi_url="/openapi.json",  # OpenAPI 规范 JSON 文件路径
     )
+    
+    # 添加请求 ID中间件
+    # 用于在每个请求中添加唯一请求 ID，方便日志记录和调试
+    app.add_middleware(RequestIdMiddleware)
+    
+    # 注册异常处理中间件
+    register_exception_handlers(app)
+    
 
     # 注册 API 路由，所有 v1 版本的接口都将使用 /api/v1 前缀
     # 例如：/api/v1/chat, /api/v1/documents 等
