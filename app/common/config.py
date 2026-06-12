@@ -15,6 +15,7 @@
 # =============================================================================
 
 from functools import lru_cache
+
 from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -211,9 +212,9 @@ class Settings(BaseSettings):
     若使用开源模型（如 BGE、gte 系列），需对应修改此值与
     EMBEDDING_API_BASE。"""
 
-    embedding_model_dim: int | None = Field(
+    embedding_dim: int | None = Field(
         default=None,
-        validation_alias="EMBEDDING_MODEL_DIM",
+        validation_alias=AliasChoices("EMBEDDING_DIM", "EMBEDDING_MODEL_DIM"),
     )
     """Embedding 向量维度。
 

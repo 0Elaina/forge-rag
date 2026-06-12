@@ -1,5 +1,9 @@
 from typing import Generic, TypeVar
+
 from pydantic import BaseModel
+
+from app.common.exceptions import ErrorCode
+from app.common.middleware import get_request_id, get_trace_id
 
 T = TypeVar("T")
 
@@ -31,17 +35,17 @@ def success_response(
     """
     return ApiResponse(
         success=True,
-        code="OK",
+        code=ErrorCode.OK.value,
         message=message,
         data=data,
-        request_id=request_id,
-        trace_id=trace_id,
+        request_id=request_id or get_request_id(),
+        trace_id=trace_id or get_trace_id(),
     )
 
 
 def error_response(
     code: str, message: str, request_id: str | None = None, trace_id: str | None = None
-) -> ApiResponse[T]:
+) -> ApiResponse[None]:
     """
     失败响应
     包含失败状态、状态码、消息、请求 ID、跟踪 ID
@@ -51,6 +55,6 @@ def error_response(
         code=code,
         message=message,
         data=None,
-        request_id=request_id,
-        trace_id=trace_id,
+        request_id=request_id or get_request_id(),
+        trace_id=trace_id or get_trace_id(),
     )
