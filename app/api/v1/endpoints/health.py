@@ -3,7 +3,8 @@ from fastapi import APIRouter
 from app.common.config import get_settings
 from app.common.exceptions import ErrorCode
 from app.common.response import ApiResponse, success_response
-from app.schemas.system import HealthResponse
+from app.infrastructure.database.session import check_postgres_connection
+from app.schemas.system import HealthResponse, ReadinessResponse
 
 router = APIRouter(tags=["System"])
 
@@ -34,8 +35,36 @@ async def health_check() -> ApiResponse[HealthResponse]:
     return success_response(
         data=HealthResponse(
             # 固定返回 SUCCESS 错误码, 表示服务健康
-            status=ErrorCode.OK,
+            status=ErrorCode.OK.value,
             # 从配置读取服务名称, 用于多服务部署时区分不同服务
             service=settings.app_name,
+        )
+    )
+
+
+@router.get(
+    "/health/ready",
+    response_model=ApiResponse[ReadinessResponse],
+    summary="检查系统依赖就绪状态",
+)
+async def readiness_check() -> ApiResponse[ReadinessResponse]:
+    dependencies: dict[str, str] = {}
+
+    try:
+        await check_postgres_connection()
+        dependencies["postgres"] = ErrorCode.OK.value
+    except Exception:
+        dependencies["postgres"] = ErrorCode.ERROR.value
+
+    status = (
+        ErrorCode.OK.value
+        if all(value == ErrorCode.OK.value for value in dependencies.values())
+        else ErrorCode.ERROR.value
+    )
+
+    return success_response(
+        data=ReadinessResponse(
+            status=status,
+            dependencies=dependencies,
         )
     )

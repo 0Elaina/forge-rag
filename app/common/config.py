@@ -40,10 +40,14 @@ class Settings(BaseSettings):
     """
 
     model_config = SettingsConfigDict(
-        env_file=".env",  # 从项目根目录的 .env 文件加载
-        env_file_encoding="utf-8",  # .env 文件编码
-        extra="ignore",  # 环境变量中有未定义的键时静默忽略
-        case_sensitive=False,  # 环境变量名不区分大小写（APP_NAME 和 app_name 等价）
+        # 从项目根目录的 .env 文件加载
+        env_file=".env",
+        # .env 文件编码
+        env_file_encoding="utf-8",
+        # 环境变量中有未定义的键时静默忽略
+        extra="ignore",
+        # 环境变量名不区分大小写（APP_NAME 和 app_name 等价）
+        case_sensitive=False,
     )
 
     # =========================================================================

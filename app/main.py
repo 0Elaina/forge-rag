@@ -25,12 +25,18 @@ def create_app() -> FastAPI:
 
     # 创建 FastAPI 应用实例，配置基本信息
     app = FastAPI(
-        title=settings.app_name,  # 应用标题，从配置中读取
-        version="0.1.0",  # API 版本号
-        description="ForgeRAG 企业知识库代理 RAG 后端系统",  # API 描述信息
-        docs_url="/docs",  # Swagger UI 文档路径
-        redoc_url="/redoc",  # ReDoc 文档路径
-        openapi_url="/openapi.json",  # OpenAPI 规范 JSON 文件路径
+        # 应用标题，从配置中读取
+        title=settings.app_name,
+        # API 版本号
+        version="0.1.0",
+        # API 描述信息
+        description="ForgeRAG 企业知识库代理 RAG 后端系统",
+        # Swagger UI 文档路径
+        docs_url="/docs",
+        # ReDoc 文档路径
+        redoc_url="/redoc",
+        # OpenAPI 规范 JSON 文件路径
+        openapi_url="/openapi.json",
     )
     
     # 添加请求 ID中间件

@@ -1,8 +1,11 @@
 from collections.abc import Awaitable, Callable
-from contextvars import ContextVar  # 上下文变量
+
+# 上下文变量
+from contextvars import ContextVar
 from uuid import uuid4
 
-from starlette.middleware.base import BaseHTTPMiddleware  # 基础 HTTP 中间件
+# 基础 HTTP 中间件
+from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
 
@@ -13,7 +16,8 @@ _trace_id_ctx: ContextVar[str | None] = ContextVar("trace_id", default=None)
 
 def generate_request_id() -> str:
     """生成请求 ID"""
-    return f"req_{uuid4().hex}" # uuid4().hex: 生成随机 UUID 4 字符串, 并转换为十六进制表示
+    # uuid4().hex: 生成随机 UUID 4 字符串, 并转换为十六进制表示
+    return f"req_{uuid4().hex}"
 
 def get_request_id() -> str | None:
     """获取当前请求 ID"""

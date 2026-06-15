@@ -3,26 +3,45 @@ from enum import StrEnum
 
 class ErrorCode(StrEnum):
     """错误码枚举"""
-    OK = "OK" # 响应成功
-    VALIDATION_ERROR = "VALIDATION_ERROR" # 请求参数校验失败
-    BAD_REQUEST = "BAD_REQUEST" # 请求参数错误
-    NOT_FOUND = "NOT_FOUND" # 资源不存在
-    BUSINESS_ERROR = "BUSINESS_ERROR" # 业务逻辑错误
-    EXTERNAL_SERVICE_ERROR = "EXTERNAL_SERVICE_ERROR" # 外部服务错误
-    DATABASE_ERROR = "DATABASE_ERROR" # 数据库错误
-    VECTOR_STORE_ERROR = "VECTOR_STORE_ERROR" # 向量数据库错误
-    MODEL_SERVICE_ERROR = "MODEL_SERVICE_ERROR" # 模型服务错误
-    INTERNAL_ERROR = "INTERNAL_ERROR" # 内部错误
+    # 响应成功
+    OK = "OK"
+    # 请求参数校验失败
+    VALIDATION_ERROR = "VALIDATION_ERROR"
+    # 请求参数错误
+    BAD_REQUEST = "BAD_REQUEST"
+    # 资源不存在
+    NOT_FOUND = "NOT_FOUND"
+    # 业务逻辑错误
+    BUSINESS_ERROR = "BUSINESS_ERROR"
+    # 外部服务错误
+    EXTERNAL_SERVICE_ERROR = "EXTERNAL_SERVICE_ERROR"
+    # 数据库错误
+    DATABASE_ERROR = "DATABASE_ERROR"
+    # 向量数据库错误
+    VECTOR_STORE_ERROR = "VECTOR_STORE_ERROR"
+    # 模型服务错误
+    MODEL_SERVICE_ERROR = "MODEL_SERVICE_ERROR"
+    # 内部错误
+    INTERNAL_ERROR = "INTERNAL_ERROR"
+    # 通用错误
+    ERROR = "ERROR"
     
 class AppException(Exception):
     """应用异常基类"""
+
     def __init__(
-        self, # 异常实例
-        message: str, # 异常消息
-        code: ErrorCode = ErrorCode.INTERNAL_ERROR, # 错误码
-        status_code: int = 500 # HTTP 状态码
+        self,
+        message: str,
+        code: ErrorCode = ErrorCode.INTERNAL_ERROR,
+        status_code: int = 500,
     ) -> None:
-        """初始化应用异常"""
+        """初始化应用异常
+        Args:
+            self: 异常实例
+            message: 异常消息
+            code: 错误码
+            status_code: HTTP 状态码
+        """
         self.message = message
         self.code = code
         self.status_code = status_code
