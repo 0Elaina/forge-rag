@@ -1,6 +1,8 @@
 import json
 import logging
-from datetime import UTC, datetime  # UTC 时间格式
+
+# UTC 时间格式
+from datetime import UTC, datetime
 from typing import Any
 
 from app.common.middleware import get_request_id, get_trace_id
@@ -53,14 +55,20 @@ def configure_logging(level: str = "INFO") -> None:
         配置全局日志记录器, 并添加 JSON 格式处理程序
         @param level: 日志级别 (DEBUG / INFO / WARNING / ERROR / CRITICAL), 默认 INFO
     """
-    root_logger = logging.getLogger() # 获取根记录器
-    root_logger.setLevel(level.upper()) # 设置根记录器的日志级别, level.upper() 确保为大写
-    
-    handler = logging.StreamHandler() # 创建标准输出流处理程序
-    handler.setFormatter(JsonFormatter()) # 设置格式化器为 JSON 格式
-    
-    root_logger.handlers.clear() # 清除根记录器的所有处理程序
-    root_logger.addHandler(handler) # 添加标准输出流处理程序到根记录器
+    # 获取根记录器
+    root_logger = logging.getLogger()
+    # 设置根记录器的日志级别, level.upper() 确保为大写
+    root_logger.setLevel(level.upper())
+
+    # 创建标准输出流处理程序
+    handler = logging.StreamHandler()
+    # 设置格式化器为 JSON 格式
+    handler.setFormatter(JsonFormatter())
+
+    # 清除根记录器的所有处理程序
+    root_logger.handlers.clear()
+    # 添加标准输出流处理程序到根记录器
+    root_logger.addHandler(handler)
         
 def get_logger(name: str) -> logging.Logger:
     """
@@ -68,6 +76,7 @@ def get_logger(name: str) -> logging.Logger:
         @param name: 记录器名称, 通常是模块名
         @return: 日志记录器对象
     """
-    return logging.getLogger(name) # 获取或创建指定名称的日志记录器
+    # 获取或创建指定名称的日志记录器
+    return logging.getLogger(name)
         
         

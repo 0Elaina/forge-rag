@@ -1,6 +1,10 @@
 from fastapi import FastAPI, Request
-from fastapi.exceptions import RequestValidationError  # 请求参数验证错误
-from starlette.responses import JSONResponse  # JSON 响应
+
+# 请求参数验证错误
+from fastapi.exceptions import RequestValidationError
+
+# JSON 响应
+from starlette.responses import JSONResponse
 
 from app.common.exceptions import AppException, ErrorCode
 from app.common.response import error_response
@@ -13,8 +17,9 @@ def register_exception_handlers(app: FastAPI) -> None:
     """
     @app.exception_handler(AppException)
     async def app_exception_handler(
-        request: Request, # 传入request的原因: 用于获取请求ID和跟踪ID
-        exc: AppException
+        # 传入request的原因: 用于获取请求ID和跟踪ID
+        request: Request,
+        exc: AppException,
     ) -> JSONResponse:
         """
             自定义异常处理函数
@@ -29,9 +34,10 @@ def register_exception_handlers(app: FastAPI) -> None:
         )
         return JSONResponse(
             status_code=exc.status_code,
-            content=body.model_dump() # model_dump(): 将模型实例转换为字典
+            # model_dump(): 将模型实例转换为字典
+            content=body.model_dump(),
         )
-        
+
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(
         request: Request,
@@ -49,14 +55,16 @@ def register_exception_handlers(app: FastAPI) -> None:
             message = "request validation error"
         )
         return JSONResponse(
-            status_code=422, # 422: Unprocessable Entity
-            content=body.model_dump() # model_dump(): 将模型实例转换为字典
+            # 422: Unprocessable Entity
+            status_code=422,
+            # model_dump(): 将模型实例转换为字典
+            content=body.model_dump(),
         )
-        
+
     @app.exception_handler(Exception)
     async def unhandled_exception_handler(
         request: Request,
-        exc: Exception
+        exc: Exception,
     ) -> JSONResponse:
         """
             自定义异常处理函数
