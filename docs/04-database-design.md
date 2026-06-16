@@ -648,6 +648,7 @@ Agentic RAG 节点记录表，用于保存关键节点的输入输出摘要和�
 | `task_id`            | `UUID`             | FK       | 评测任务 ID               |
 | `sample_id`          | `UUID`             | FK       | 评测样本 ID               |
 | `qa_record_id`       | `UUID`             | FK NULL  | 关联问答记录              |
+| `agent_run_id`       | `UUID`             | FK NULL  | 关联 Agentic RAG 执行记录，仅 agentic_rag 评测使用 |  
 | `question`           | `TEXT`             | NOT NULL | 执行时的问题快照          |
 | `generated_answer`   | `TEXT`             | NULL     | 生成答案                  |
 | `reference_answer`   | `TEXT`             | NULL     | 参考答案快照              |
