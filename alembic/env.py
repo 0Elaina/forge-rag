@@ -10,7 +10,19 @@ from alembic import context
 
 from app.common.config import get_settings
 from app.infrastructure.database.base import Base
-from app.infrastructure.database.models import Document, DocumentChunk, KnowledgeBase
+from app.infrastructure.database.models import (
+    Document,
+    DocumentChunk,
+    KnowledgeBase,
+    AgentRun,
+    AgentStep,
+    EvaluationTask,
+    EvaluationSample,
+    EvaluationResult,
+    EvaluationDataset,
+    QARecord,
+    QACitation
+)
 
  # 获取应用配置
 settings = get_settings()

@@ -56,7 +56,7 @@ class DocumentChunk(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     # 定义整数字段，用于存储文档分块的索引，不允许为空
     chunk_index: Mapped[int] = mapped_column(Integer, nullable=False)
     # 定义文本字段，用于存储文档分块的内容，不允许为空
-    cotent: Mapped[str] = mapped_column(Text, nullable=False)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
     # 定义字符串字段，用于存储文档分块的内容哈希值，允许为空
     content_hash: Mapped[str | None] = mapped_column(String(128), nullable=True)
 
