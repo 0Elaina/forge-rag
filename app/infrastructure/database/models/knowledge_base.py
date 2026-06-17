@@ -8,7 +8,7 @@ from typing import Any
 from uuid import UUID
 
 # 导入SQLAlchemy的索引、整数、字符串、文本类型
-from sqlalchemy import Index, Integer, String, Text
+from sqlalchemy import DateTime, Index, Integer, String, Text
 
 # 导入PostgreSQL的JSONB类型
 from sqlalchemy.dialects.postgresql import JSONB
@@ -65,7 +65,10 @@ class KnowledgeBase(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     # 定义知识库更新人ID字段，允许为空, as_uuid=True 表示将UUID类型转换为Python UUID对象
     updated_by: Mapped[UUID | None] = mapped_column(PG_UUID(as_uuid=True), nullable=True)
     # 定义知识库删除时间字段，允许为空, 数据类型由sqlalchemy自动处理
-    deleted_at: Mapped[datetime | None] = mapped_column(nullable=True)
+    deleted_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True
+    )
 
     # 定义数据库表索引
     __table_args__ = (

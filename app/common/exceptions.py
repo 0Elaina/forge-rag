@@ -26,6 +26,12 @@ class ErrorCode(StrEnum):
     # 通用错误
     ERROR = "ERROR"
     
+    
+    # 知识库不存在
+    KB_NOT_FOUND = "KB_NOT_FOUND"
+    # 知识库已禁用
+    KB_DISABLED = "KB_DISABLED"
+    
 class AppException(Exception):
     """应用异常基类"""
 
@@ -87,3 +93,14 @@ class ModelServiceException(AppException):
     """模型服务错误异常"""
     def __init__(self, message: str = "model service error") -> None:
         super().__init__(message, ErrorCode.MODEL_SERVICE_ERROR, 502)
+        
+        
+class KnowledgeBaseNotFoundException(AppException):
+    """知识库不存在异常"""
+    def __init__(self, message: str = "knowledge base not found") -> None:
+        super().__init__(message, ErrorCode.KB_NOT_FOUND, 404)
+        
+class KnowledgeBaseDisabledException(AppException):
+    """知识库不可用异常"""
+    def __init__(self, message: str = "knowledge base is disabled") -> None:
+        super().__init__(message, ErrorCode.KB_DISABLED, 409)
